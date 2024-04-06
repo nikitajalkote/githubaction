@@ -15,3 +15,40 @@ jobs:
 
     - name: looking into the runner machine
       run: ls
+
+    - name: executing remote ssh commands using key
+      uses:  appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script:
+          whoami
+          pwd
+          ls
+          sudo mkdir -p /var/www/html
+          sudo chown -R ${{ secrets.EC2_USENAME }} /var/www/html
+          sudo chmod -R 755 /var/www/html
+
+    - name: copy file via SSH key
+      uses:  appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22  
+        source: ./
+        target: /var/www/html
+
+    - name: copy file via SSH key
+      uses:  appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22  
+        script:
+          sudo systemctl restart nginx
+            
+        
