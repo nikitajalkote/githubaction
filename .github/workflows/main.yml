@@ -41,7 +41,7 @@ jobs:
         source: ./
         target: /var/www/html
 
-    - name: copy file via SSH key
+    - name: restart NGINX
       uses:  appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
