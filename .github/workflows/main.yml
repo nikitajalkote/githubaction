@@ -48,7 +48,6 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         port: 22  
         script:
-          sudo python3 Hello.py
           sudo systemctl restart nginx
             
         
