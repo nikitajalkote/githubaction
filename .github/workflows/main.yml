@@ -12,10 +12,16 @@ jobs:
     steps:
     - name: checking out code
       uses: actions/checkout@v4
-
+      
     - name: looking into the runner machine
       run: ls
 
+    - name: Install Dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pytest
+
+   
     - name: executing remote ssh commands using key
       uses:  appleboy/ssh-action@v1.0.3
       with:
@@ -26,9 +32,9 @@ jobs:
         script:
           pwd
           ls
-          sudo mkdir -p /var/www/html
-          sudo chown -R ${{ secrets.EC2_USENAME }} /var/www/html
-          sudo chmod -R 755 /var/www/html
+          sudo mkdir -p /home/ubuntu/githubaction
+          sudo chown -R ${{ secrets.EC2_USERNAME }} /home/ubuntu/githubaction
+          sudo chmod -R 755 /home/ubuntu/githubaction
 
     - name: copy file via SSH key
       uses:  appleboy/ssh-action@v0.1.7
@@ -38,16 +44,17 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         port: 22  
         source: ./
-        target: /var/www/html
-
-    - name: restart NGINX
-      uses:  appleboy/ssh-action@v1.0.3
+        target: /home/ubuntu/githubaction
+        
+        
+    - name: run python file
+      uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_KEY }}
         port: 22  
-        script:
-          sudo systemctl restart nginx
-            
-        
+        script: |
+          cd /home/ubuntu/githubaction
+          ls
+          python3 Hello.py
