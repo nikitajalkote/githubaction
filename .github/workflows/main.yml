@@ -1,53 +1,52 @@
-name: EC2 deployment
+name: EC2 deployement
 
-on:
-  push:
-    branches:
-      - main
+on: 
+   push:
+     branches:
+       - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: checking out code
+    - name: checking-out code
       uses: actions/checkout@v4
 
     - name: looking into the runner machine
       run: ls
 
     - name: executing remote ssh commands using key
-      uses:  appleboy/ssh-action@v1.0.3
+      uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_KEY }}
+        key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
-        script:
-          pwd
-          ls
-          sudo mkdir -p /var/www/html
-          sudo chown -R ${{ secrets.EC2_USENAME }} /var/www/html
-          sudo chmod -R 755 /var/www/html
+        script: |
+           whoami
+           pwd
+           ls
+           sudo mkdir -p /var/www/html
+           sudo chown -R ${{ secrets.EC2_USERNAME }} /var/www/html
+           sudo chmod -R 755 /var/www/html
 
-    - name: copy file via SSH key
-      uses:  appleboy/ssh-action@v0.1.7
+    - name: copy file via ssh key
+      uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_KEY }}
-        port: 22  
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
         source: ./
         target: /var/www/html
 
-    - name: restart NGINX
-      uses:  appleboy/ssh-action@v1.0.3
+    - name: restarting nginx
+      uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_KEY }}
-        port: 22  
-        script:
-          sudo systemctl restart nginx
-            
-        
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+           sudo systemctl restart nginx
